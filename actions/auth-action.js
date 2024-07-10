@@ -1,21 +1,43 @@
 "use server";
-const Signup = async (prevState, formData) => {
+import { redirect } from "next/navigation";
+
+import { hashUserPassword } from "@/lib/hash";
+import { createUser } from "@/lib/user";
+
+export async function signup(prevState, formData) {
   const email = formData.get("email");
   const password = formData.get("password");
-  let error = {};
+
+  let errors = {};
 
   if (!email.includes("@")) {
-    error.email = "Invalid email";
-  }
-  if (password.trim().length < 8) {
-    error.password = "Password must be at least 8 characters";
+    errors.email = "Please enter a valid email address.";
   }
 
-  if (Object.keys(error).length > 0) {
+  if (password.trim().length < 8) {
+    errors.password = "Password must be at least 8 characters long.";
+  }
+
+  if (Object.keys(errors).length > 0) {
     return {
-      error,
+      errors,
     };
   }
-};
 
-export default Signup;
+  const hashedPassword = hashUserPassword(password);
+  try {
+    createUser(email, hashedPassword);
+  } catch (error) {
+    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      return {
+        errors: {
+          email:
+            "It seems like an account for the chosen email already exists.",
+        },
+      };
+    }
+    throw error;
+  }
+
+  redirect("/training");
+}
