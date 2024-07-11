@@ -26,6 +26,7 @@ export async function signup(prevState, formData) {
 
   const hashedPassword = hashUserPassword(password);
   try {
+    console.log("here");
     createUser(email, hashedPassword);
   } catch (error) {
     if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {

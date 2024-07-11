@@ -1,12 +1,13 @@
 "use client";
-import Signup from "@/actions/auth-action";
+import { signup } from "@/actions/auth-action";
 import Link from "next/link";
 
 import { useFormState } from "react-dom";
 
 export default function AuthForm() {
-  const [formState, useFormAction] = useFormState(Signup, {});
+  const [formState, useFormAction] = useFormState(signup, {});
 
+  console.log(formState);
   return (
     <form id="auth-form" action={useFormAction}>
       <div>
@@ -22,9 +23,9 @@ export default function AuthForm() {
       </p>
 
       <ul id="form-errors">
-        {formState.error &&
-          Object.keys(formState.error).map((error) => {
-            return <li key={error}>{formState.error[error]}</li>;
+        {formState.errors &&
+          Object.keys(formState.errors).map((error) => {
+            return <li key={error}>{formState.errors[error]}</li>;
           })}
       </ul>
       <p>
